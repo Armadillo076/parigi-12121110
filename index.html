@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direzione Parigi</title>
+
+<meta property="og:title" content="Direzione Parigi">
+<meta property="og:description" content="Un quiz solo per te, prima di partire.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1b3f7c">
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Figtree:wght@400;500;700&family=Sofia+Sans+Condensed:wght@500;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --inchiostro: #14284a;
+    --smalto: #1b3f7c;        
+    --linea: #ffcd00;         
+    --giusto: #2f7a52;        
+    --giusto-chiaro: #d8f0e2;
+    --sbagliato: #c8102e;
+    --sbagliato-chiaro: #fadbe0;
+    --fuga: #b8c3c9;
+    --font-segnaletica: "Sofia Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+    --font-testo: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mano: "Caveat", "Bradley Hand", cursive;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--font-testo);
+    color: var(--inchiostro);
+    background-color: #eef2f3;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Crect width='44' height='44' fill='%23eef2f3'/%3E%3Cpath d='M0 .75H44M0 22.75H44M.75 0V22M22.75 22V44' stroke='%23c9d1d5' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  main {
+    min-height: 100%;
+    max-width: 30rem;
+    margin: 0 auto;
+    padding: 1.5rem 1.25rem 2rem;
+    display: flex;
+    flex-Direction: column;
+    justify-content: center;
+  }
+
+  .schermata { display: none; }
+  .schermata.attiva { display: block; animation: entra-schermata .7s cubic-bezier(.2, .8, .2, 1) both; }
+  .schermata.nuova > * { animation: entra-con-stacco .65s cubic-bezier(.2, .8, .2, 1) both; }
+  .schermata.nuova > *:nth-child(2) { animation-delay: .08s; }
+  .schermata.nuova > *:nth-child(3) { animation-delay: .16s; }
+  .schermata.nuova > *:nth-child(4) { animation-delay: .24s; }
+  .schermata.nuova > *:nth-child(5) { animation-delay: .32s; }
+
+  @keyframes entra-schermata {
+    from { opacity: 0; transform: translateY(1rem) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes entra-con-stacco {
+    from { opacity: 0; transform: translateY(.8rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  p { font-size: 1.05rem; line-height: 1.55; margin-bottom: 1.5rem; }
+
+  .targa {
+    position: relative;
+    background: var(--smalto);
+    color: #fff;
+    font-family: var(--font-segnaletica);
+    font-weight: 700;
+    line-height: 1.1;
+    padding: 1.35rem 1.5rem;
+    border-radius: .7rem;
+    box-shadow:
+      inset 0 0 0 4px var(--smalto),
+      inset 0 0 0 6px #fff,
+      0 4px 0 rgba(20, 40, 74, .25);
+    margin-bottom: 1.5rem;
+  }
+  .targa::before,
+  .targa::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: .5rem;
+    height: .5rem;
+    margin-top: -.25rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e4e9ef, #7f8da5);
+  }
+  .targa::before { left: .7rem; }
+  .targa::after { right: .7rem; }
+
+  h1.targa { font-size: clamp(2.1rem, 9vw, 2.8rem); }
+  h2.targa { font-size: clamp(1.6rem, 6.5vw, 2rem); }
+  .targa.media { font-size: clamp(1.45rem, 6vw, 1.8rem); }
+
+  .direzione {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: 1.1rem;
+    font-family: var(--font-segnaletica);
+    font-weight: 700;
+    font-size: 1.35rem;
+  }
+  .badge {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    background: var(--linea);
+    color: var(--inchiostro);
+    font-weight: 800;
+    font-size: 1.5rem;
+  }
+
+  .foto {
+    width: 100%;
+    max-height: 14rem;
+    object-fit: cover;
+    border: 7px solid #fff;
+    border-radius: .35rem;
+    box-shadow: 0 3px 10px rgba(20, 40, 74, .25);
+    transform: rotate(-1deg);
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+
+  [hidden] { display: none !important; }
+
+  button { font: inherit; cursor: pointer; border: 0; color: inherit; }
+  button:focus-visible { outline: 3px solid var(--smalto); outline-offset: 3px; }
+
+  .principale {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border-radius: .6rem;
+    background: var(--linea);
+    color: var(--inchiostro);
+    font-family: var(--font-segnaletica);
+    font-weight: 800;
+    font-size: 1.35rem;
+    box-shadow: 0 4px 0 #b08f00;
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .principale:active { transform: translateY(3px); box-shadow: 0 1px 0 #b08f00; }
+
+  .progresso { margin-bottom: 1.5rem; }
+  .progresso-testo {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: .6rem;
+    font-size: .95rem;
+  }
+  .progresso-testo strong {
+    font-family: var(--font-segnaletica);
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .linea {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1.7rem;
+  }
+  .binario {
+    position: absolute;
+    left: .5rem;
+    right: .5rem;
+    top: 50%;
+    height: .45rem;
+    transform: translateY(-50%);
+    border-radius: 99px;
+    background: var(--fuga);
+  }
+  .binario-pieno {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: var(--linea);
+    transition: width .6s ease;
+  }
+  .fermata {
+    position: relative;
+    z-index: 1;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--inchiostro);
+    transition: background .3s ease;
+  }
+  .fermata.passata { background: var(--linea); }
+  .fermata.corrente {
+    width: 1.55rem;
+    height: 1.55rem;
+    background: var(--linea);
+    box-shadow: 0 0 0 4px rgba(255, 205, 0, .4);
+  }
+
+  .risposte { display: grid; gap: .7rem; margin-bottom: 1.25rem; }
+
+  .risposta {
+    text-align: left;
+    padding: 1rem 1.1rem;
+    min-height: 3.5rem;
+    border-radius: .5rem;
+    background: linear-gradient(#ffffff, #f0f4f5);
+    border: 1px solid #aeb9bf;
+    box-shadow: inset 0 -3px 0 #d3dbde, inset 0 2px 0 #fff;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .risposta:hover:not(:disabled) { transform: translateY(-3px) rotate(-.35deg); box-shadow: inset 0 -3px 0 #d3dbde, inset 0 2px 0 #fff, 0 7px 14px rgba(20, 40, 74, .12); }
+  .risposta:active { transform: scale(.985); }
+  .risposta:disabled { cursor: default; }
+  .risposta.giusta { background: var(--giusto-chiaro); border-color: var(--giusto); box-shadow: inset 0 -3px 0 #b7dcc6; }
+  .risposta.sbagliata { background: var(--sbagliato-chiaro); border-color: var(--sbagliato); box-shadow: inset 0 -3px 0 #f0b6bf; }
+  .risposta.spenta { opacity: .5; }
+
+  .commento {
+    min-height: 3rem;
+    padding-left: .85rem;
+    border-left: 4px solid var(--linea);
+    font-size: 1.02rem;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+  }
+  .commento:empty { border-left-color: transparent; }
+
+  #btn-avanti { display: none; }
+  #btn-avanti.visibile { display: block; }
+
+  .punteggio {
+    font-family: var(--font-segnaletica);
+    font-weight: 800;
+    font-size: clamp(3.4rem, 18vw, 5rem);
+    color: var(--smalto);
+    line-height: 1;
+    margin-bottom: .6rem;
+  }
+
+  .cartolina {
+    background: #fff;
+    border-radius: .3rem;
+    padding: 1.2rem 1.25rem;
+    margin-bottom: 1.75rem;
+    box-shadow: 0 3px 10px rgba(20, 40, 74, .22);
+    transform: rotate(-.8deg);
+    border-top: 6px solid var(--smalto);
+  }
+  .cartolina p {
+    margin: 0;
+    font-family: var(--font-mano);
+    font-weight: 500;
+    font-size: 1.55rem;
+    line-height: 1.3;
+    white-space: pre-line;
+  }
+
+  .biglietto {
+    background: #fff;
+    border-radius: .9rem;
+    padding: 1.2rem 1.25rem 1.1rem;
+    margin-bottom: 1.75rem;
+    border-left: 8px solid var(--linea);
+    box-shadow: 0 3px 10px rgba(20, 40, 74, .2);
+    -webkit-mask:
+      radial-gradient(circle 9px at 0 58%, transparent 97%, #000),
+      radial-gradient(circle 9px at 100% 58%, transparent 97%, #000);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle 9px at 0 58%, transparent 97%, #000),
+      radial-gradient(circle 9px at 100% 58%, transparent 97%, #000);
+    mask-composite: intersect;
+  }
+  .biglietto-tratta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    font-family: var(--font-segnaletica);
+    font-weight: 800;
+    font-size: clamp(1.6rem, 7vw, 2.1rem);
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px dashed rgba(20, 40, 74, .3);
+  }
+  .biglietto-tratta .aereo { font-size: 1.4rem; color: var(--smalto); }
+  .biglietto-dettagli { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-bottom: .9rem; }
+  .biglietto small { display: block; font-size: .85rem; opacity: .7; margin-bottom: .15rem; }
+  .biglietto b { font-weight: 700; font-size: 1.05rem; }
+  .biglietto-nota { font-size: .95rem; line-height: 1.4; }
+
+  .secondario {
+    display: block;
+    width: 100%;
+    margin-top: .9rem;
+    padding: .9rem 1.25rem;
+    border-radius: .6rem;
+    background: transparent;
+    border: 2px solid var(--smalto);
+    color: var(--smalto);
+    font-weight: 700;
+  }
+
+  .cuore {
+    position: fixed;
+    bottom: -2rem;
+    pointer-events: none;
+    animation: sale linear forwards;
+    z-index: 10;
+  }
+  @keyframes sale {
+    0% { opacity: 0; transform: translateY(0) rotate(-10deg) scale(.7); }
+    12% { opacity: 1; }
+    50% { transform: translateY(-55vh) translateX(18px) rotate(12deg) scale(1); }
+    100% { transform: translateY(-115vh) translateX(-18px) rotate(24deg) scale(.85); opacity: 0; }
+  }
+
+  .biglietto-conto {
+    font-family: var(--font-segnaletica);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--smalto);
+    margin-bottom: .5rem;
+  }
+
+  .busta { margin-bottom: 1.75rem; text-align: center; }
+  .busta-corpo {
+    position: relative;
+    height: 7rem;
+    margin: 0 auto 1.1rem;
+    max-width: 17rem;
+    background: #fff;
+    border-radius: .4rem;
+    box-shadow: 0 3px 10px rgba(20, 40, 74, .22);
+  }
+  .busta-corpo::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 62%;
+    background: linear-gradient(#f6f8f9, #d9e0e4);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-radius: .4rem .4rem 0 0;
+  }
+  .sigillo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2.8rem;
+    height: 2.8rem;
+    margin: -1.4rem 0 0 -1.4rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e23a52, var(--sbagliato) 60%, #8f0a20);
+    color: #fff;
+    font-size: 1.3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+    animation: battito 1.8s ease-in-out infinite;
+  }
+  @keyframes battito {
+    0%, 100% { transform: scale(1); }
+    12% { transform: scale(1.08); }
+    24% { transform: scale(1); }
+    36% { transform: scale(1.08); }
+    48% { transform: scale(1); }
+  }
+  .busta h3 {
+    font-family: var(--font-segnaletica);
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: .3rem;
+  }
+  .busta p { margin-bottom: .9rem; }
+  .busta .secondario { margin-top: 0; }
+  .stato { min-height: 1.5rem; margin: .8rem 0 0 !important; font-size: .98rem; font-weight: 500; }
+
+  #intro-stato:empty { display: none; }
+  #lettera-testo { min-height: 8rem; }
+  #lettera-testo::after {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    margin-left: 2px;
+    vertical-align: -.2em;
+    background: var(--inchiostro);
+    animation: lampeggia 1s steps(2) infinite;
+  }
+  #lettera-testo.finito::after { display: none; }
+  @keyframes lampeggia { 50% { opacity: 0; } }
+
+  /* ---- Romanticismo: sfondo, quiz, conto alla rovescia, busta ---- */
+  .cuore-sfondo {
+    position: fixed;
+    bottom: -2rem;
+    color: #e23a52;
+    pointer-events: none;
+    z-index: -1;
+    animation: fluttua-su linear forwards;
+  }
+  @keyframes fluttua-su {
+    0% { opacity: 0; transform: translateY(0) translateX(0) rotate(-8deg); }
+    15% { opacity: .28; }
+    50% { transform: translateY(-55vh) translateX(22px) rotate(8deg); }
+    85% { opacity: .2; }
+    100% { opacity: 0; transform: translateY(-112vh) translateX(-16px) rotate(-6deg); }
+  }
+
+  .mini-cuore {
+    position: fixed;
+    margin: -.5rem 0 0 -.5rem;
+    color: #e23a52;
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 10;
+    animation: scoppia 1.1s ease-out forwards;
+  }
+  @keyframes scoppia {
+    0% { opacity: 1; transform: translate(0, 0) scale(.5); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.3); }
+  }
+
+  .principale { position: relative; overflow: hidden; }
+  .principale::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+    left: -60%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent);
+    animation: luccica 3.6s ease-in-out infinite;
+  }
+  @keyframes luccica {
+    0%, 55% { left: -60%; }
+    100% { left: 130%; }
+  }
+
+  .fermata.corrente { animation: respiro 1.6s ease-in-out infinite; }
+  @keyframes respiro {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255, 205, 0, .4); }
+    50% { box-shadow: 0 0 0 9px rgba(226, 58, 82, .18); }
+  }
+  .binario-pieno { position: relative; }
+  .binario-pieno::after {
+    content: "♥";
+    position: absolute;
+    right: -.55rem;
+    top: -.6rem;
+    font-size: 1.1rem;
+    color: #e23a52;
+    animation: battito 1.8s ease-in-out infinite;
+  }
+
+  .risposta.giusta { animation: risposta-giusta .7s ease-out; }
+  @keyframes risposta-giusta {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(226, 58, 82, .5); }
+    40% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(226, 58, 82, 0); }
+    100% { transform: scale(1); }
+  }
+  .risposta.sbagliata { animation: scuoti .45s ease-in-out; }
+  @keyframes scuoti {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(2px); }
+  }
+  .commento:not(:empty) { animation: sfuma-su .55s ease-out both; }
+  @keyframes sfuma-su {
+    from { opacity: 0; transform: translateY(.5rem); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .punteggio { animation: battito 2.2s ease-in-out infinite; }
+
+  .biglietto-conto {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+  }
+  .biglietto-conto:not(:empty)::before,
+  .biglietto-conto:not(:empty)::after {
+    content: "♥";
+    color: #e23a52;
+    font-size: 1.1rem;
+    animation: battito 1.8s ease-in-out infinite;
+  }
+  .biglietto-conto:not(:empty)::after { animation-delay: .9s; }
+  .biglietto-conto.pop { animation: conto-pop .8s cubic-bezier(.2, .8, .2, 1) both; }
+  @keyframes conto-pop {
+    0% { opacity: 0; transform: scale(.85); letter-spacing: .08em; }
+    60% { opacity: 1; transform: scale(1.06); }
+    100% { transform: scale(1); letter-spacing: 0; }
+  }
+
+  .busta-corpo { animation: sbircia 4.5s ease-in-out infinite; }
+  @keyframes sbircia {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-5px) rotate(-1.2deg); }
+    50% { transform: translateY(0) rotate(0); }
+    75% { transform: translateY(-3px) rotate(1deg); }
+  }
+  .busta-corpo::before { transform-origin: top; animation: risvolto 4.5s ease-in-out infinite; }
+  @keyframes risvolto {
+    0%, 100% { transform: scaleY(1); }
+    25%, 75% { transform: scaleY(.9); }
+  }
+  .busta-corpo.rifiuta { animation: scuoti .5s ease-in-out; }
+  .sigillo::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(226, 58, 82, .55), transparent 68%);
+    animation: alone 1.8s ease-in-out infinite;
+  }
+  @keyframes alone {
+    0%, 100% { opacity: .35; transform: scale(.9); }
+    50% { opacity: 1; transform: scale(1.25); }
+  }
+  .scintilla {
+    position: absolute;
+    color: #e0a800;
+    font-size: .9rem;
+    pointer-events: none;
+    animation: scintilla 2.6s ease-in-out infinite;
+  }
+  .scintilla:nth-of-type(1) { left: -.9rem; top: 8%; }
+  .scintilla:nth-of-type(2) { right: -.8rem; top: 22%; animation-delay: .8s; font-size: .75rem; }
+  .scintilla:nth-of-type(3) { left: 14%; bottom: -.7rem; animation-delay: 1.5s; font-size: .7rem; }
+  .scintilla:nth-of-type(4) { right: 10%; bottom: -.8rem; animation-delay: 2s; }
+  @keyframes scintilla {
+    0%, 100% { opacity: 0; transform: scale(.4) rotate(0); }
+    50% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+  }
+  .busta-cuore {
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    color: #e23a52;
+    font-size: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    animation: esce-dalla-busta 5s ease-in infinite;
+  }
+  .busta-cuore:nth-of-type(6) { margin-left: -1.6rem; animation-delay: 1.7s; font-size: .8rem; }
+  .busta-cuore:nth-of-type(7) { margin-left: 1rem; animation-delay: 3.3s; font-size: .9rem; }
+  @keyframes esce-dalla-busta {
+    0% { opacity: 0; transform: translateY(0) scale(.5); }
+    15% { opacity: .9; }
+    100% { opacity: 0; transform: translateY(-5.5rem) translateX(10px) scale(1.2); }
+  }
+
+  #lettera-cartolina { position: relative; }
+  #lettera-cartolina::after {
+    content: "♥";
+    position: absolute;
+    top: -.9rem;
+    right: -.4rem;
+    font-size: 1.7rem;
+    color: #e23a52;
+    animation: battito 1.8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .cuore, .cuore-sfondo, .mini-cuore, .busta-cuore { display: none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <section id="intro" class="schermata attiva">
+    <img id="intro-foto" class="foto" alt="" hidden>
+    <div class="direzione"><span class="badge" aria-hidden="true">1</span><span>Direzione Parigi</span></div>
+    <h1 class="targa" id="intro-titolo"></h1>
+    <p id="intro-testo"></p>
+    <button class="principale" id="btn-inizia">Inizia</button>
+    <button class="secondario" id="btn-lettera-intro" hidden></button>
+    <p class="stato" id="intro-stato" role="status"></p>
+  </section>
+
+  <section id="quiz" class="schermata" aria-live="polite">
+    <div class="progresso">
+      <div class="progresso-testo">
+        <strong id="fermata-nome"></strong>
+        <span id="progresso-testo"></span>
+      </div>
+      <div class="linea" id="linea"></div>
+    </div>
+    <img id="domanda-foto" class="foto" alt="" hidden>
+    <h2 class="targa media" id="domanda-testo"></h2>
+    <div class="risposte" id="risposte"></div>
+    <p class="commento" id="commento"></p>
+    <button class="principale" id="btn-avanti">Avanti</button>
+  </section>
+
+  <section id="finale" class="schermata">
+    <div class="punteggio" id="punteggio"></div>
+    <h2 class="targa" id="finale-titolo"></h2>
+    <div class="cartolina"><p id="finale-lettera"></p></div>
+    <div class="biglietto" aria-label="Carta d'imbarco">
+      <div class="biglietto-tratta">
+        <span id="b-da"></span><span class="aereo" aria-hidden="true">✈</span><span id="b-a"></span>
+      </div>
+      <div class="biglietto-dettagli">
+        <div><small>Passeggeri</small><b id="b-pass"></b></div>
+        <div><small>Data</small><b id="b-data"></b></div>
+      </div>
+      <div class="biglietto-conto" id="b-conto"></div>
+      <div class="biglietto-nota" id="b-nota"></div>
+    </div>
+
+    <div class="busta">
+      <div class="busta-corpo" id="busta-corpo">
+        <span class="scintilla" aria-hidden="true">✦</span>
+        <span class="scintilla" aria-hidden="true">✦</span>
+        <span class="scintilla" aria-hidden="true">✦</span>
+        <span class="scintilla" aria-hidden="true">✦</span>
+        <span class="sigillo" aria-hidden="true">♥</span>
+        <span class="busta-cuore" aria-hidden="true">♥</span>
+        <span class="busta-cuore" aria-hidden="true">♥</span>
+        <span class="busta-cuore" aria-hidden="true">♥</span>
+      </div>
+      <h3 id="busta-titolo"></h3>
+      <p id="busta-testo"></p>
+      <button class="secondario" id="btn-busta"></button>
+      <p class="stato" id="busta-stato" role="status"></p>
+    </div>
+    <h2 class="targa media" id="finale-domanda"></h2>
+    <button class="secondario" id="btn-rigioca">Rigioca</button>
+  </section>
+
+  <section id="lettera" class="schermata">
+    <h2 class="targa" id="lettera-titolo"></h2>
+    <div class="cartolina" id="lettera-cartolina"><p id="lettera-testo"></p></div>
+    <button class="secondario" id="btn-lettera-indietro">Indietro</button>
+  </section>
+
+</main>
+
+<script>
+const CONFIG = {
+
+  intro: {
+    titolo: "Parigi, dicembre. Sei pronta?",
+    testo: "Cinque domande prima di partire. Rispondi senza pensarci troppo.",
+    foto: ""
+  },
+
+  domande: [
+    {
+      fermata: "Montmartre",
+      testo: "Con cosa e dove faremo colazione prima di partire?",
+      risposte: ["Baguette sul treno, di nascosto", 
+      "Croissant in aeroporto a Fiumicino", 
+      "Niente, dormiamo fino all'ultimo"],
+      giusta: 1,
+      ok: "Croissant a Fiumicino: la colazione perfetta per iniziare il viaggio, in attesa di quelli veri a Parigi!",
+      ko: "Era Croissant in aeroporto a Fiumicino. Ti perdono, siamo ancora all'inizio.",
+      foto: ""
+    },
+    {
+      fermata: "Le Marais",
+      testo: "A che ora partiamo per Parigi?",
+      risposte: ["Prestissimo, di notte", 
+      "Dopo pranzo, con calma", 
+      "Mattina, appena svegli"], 
+      giusta: 0,
+      ok: "Si parte prestissimo, quando è ancora buio: svegli insieme tutta la notte, e chissà, qualche fiocchetto che ti scivola addosso :)",
+      ko: "Era Prestissimo, di notte. Vento gelido, e chissà, qualche fiocchetto che ti scivola addosso :)",
+      foto: ""
+    },
+    {
+      fermata: "Louvre",
+      testo: "Prima tappa a Parigi: cosa facciamo?",
+      risposte: [
+        "Passeggiata lungo la Senna",
+        "Salire sulla Torre Eiffel",
+        "Perderci senza mappa"
+      ],
+      giusta: null,
+      ok: "Scelta approvata. La segno nel programma.",
+      foto: ""
+    },
+    {
+      fermata: "Saint-Germain",
+      testo: "Chi dei due dimenticherà qualcosa a casa prima di partire?",
+      risposte: ["Io", "Tu", "Tutti e due"],
+      giusta: 2,
+      ok: "Prevedibile. Faremo una lista.",
+      ko: "Era «Tutti e due». Ne sono certo Ambi. Faremo una lista, ecco-",
+      foto: ""
+    },
+    {
+      fermata: "Notre-Dame",
+      testo: "Prima cena a Parigi, dove?",
+      risposte: [
+        "In battello sulla Senna",
+        "In un localino nascosto",
+        "Tra i mercatini di Natale, con vin chaud e crêpes"
+      ],
+      giusta: null,
+      ok: "Ovunque, purché con te",
+      foto: ""
+    },
+    {
+      fermata: "Tour Eiffel",
+      testo: "E dopo Parigi?",
+      risposte: [
+        "Un altro viaggio insieme",
+        "Una città dove vivere insieme",
+        "Prima Parigi, poi decidiamo!"
+      ],
+      giusta: null,
+      ok: "Una cosa è certa, il prossimo capitolo lo scriviamo in due. 🩵",
+      foto: ""
+    }
+  ],
+
+  finali: [
+    {
+      da: 100,
+      titolo: "Punteggio pieno. Si parte.",
+      lettera: "Ci conosciamo da poco, ma il primo viaggio è già in programma :)"
+    },
+    {
+      da: 50,
+      titolo: "Promossa. Si parte comunque.",
+      lettera: "Non serve sapere tutto: abbiamo quattro giorni per rimediare :)"
+    },
+    {
+      da: 0,
+      titolo: "Ripasso urgente. Si parte lo stesso.",
+      lettera: "Hai sbagliato parecchio, ma a Parigi ci vieni ugualmente dai..."
+    }
+  ],
+
+  viaggio: {
+    dal: "2026-12-11",
+    al: "2026-12-14",
+    luogo: { lat: 48.8566, lon: 2.3522, raggioKm: 15 }
+  },
+
+  biglietto: {
+    da: "Fiumicino",
+    a: "Parigi",
+    passeggeri: "Ambra e Federico",
+    nota: "Il nostro primo viaggio insieme."
+  },
+
+  busta: {
+    titolo: "Una lettera per Parigi",
+    testo: "Si apre solo quando sei davvero a Parigi.",
+    pulsante: "Prova ad aprirla",
+    pulsanteIntro: "C'è una lettera per te",
+    chiusa: "Non ancora. Si apre a Parigi.",
+    data: "La lettera si apre solo il giorno della partenza, a Parigi.",
+    controllo: "Controllo dove sei...",
+    negata: "Per aprirla devo sapere se sei a Parigi. Consenti la posizione per questo sito e riprova.",
+    nonTrovata: "Non riesco a capire dove sei. Attiva la posizione (meglio con il GPS) e riprova.",
+    imprecisa: "La posizione non è abbastanza precisa. Riprova all'aperto o con il GPS attivo."
+  },
+
+  lettera: {
+    titolo: "Benvenuta a Parigi"
+  },
+
+  finale: {
+    domanda: "Ci vediamo a Parigi?"
+  },
+
+  // Dopo che lei ha fatto il quiz: metti qui il suo punteggio (un numero, es. 4) e ripubblica.
+  // Da quel momento il sito apre SEMPRE biglietto, lettera e countdown, su qualsiasi telefono.
+  // Con null il sito parte dall'intro e dal quiz, come al solito.
+  finaleFisso: null
+};
+
+const $ = (id) => document.getElementById(id);
+const schermate = { intro: $("intro"), quiz: $("quiz"), finale: $("finale"), lettera: $("lettera") };
+
+let indice = 0;
+let punti = 0;
+let bloccato = false;
+
+function mostra(nome) {
+  Object.values(schermate).forEach((s) => s.classList.remove("attiva"));
+  schermate[nome].classList.add("attiva");
+  schermate[nome].classList.remove("nuova");
+  void schermate[nome].offsetWidth;
+  schermate[nome].classList.add("nuova");
+  window.scrollTo(0, 0);
+}
+
+function impostaFoto(img, src) {
+  if (src) { img.src = src; img.hidden = false; }
+  else { img.removeAttribute("src"); img.hidden = true; }
+}
+
+function inizializzaIntro() {
+  $("intro-titolo").textContent = CONFIG.intro.titolo;
+  $("intro-testo").textContent = CONFIG.intro.testo;
+  impostaFoto($("intro-foto"), CONFIG.intro.foto);
+}
+
+function disegnaLinea() {
+  const n = CONFIG.domande.length;
+  let html = '<div class="binario"><span class="binario-pieno" id="binario-pieno"></span></div>';
+  for (let i = 0; i < n; i++) html += '<span class="fermata"></span>';
+  $("linea").innerHTML = html;
+}
+
+function aggiornaLinea() {
+  const n = CONFIG.domande.length;
+  const fermate = $("linea").querySelectorAll(".fermata");
+  fermate.forEach((f, i) => {
+    f.classList.toggle("passata", i < indice);
+    f.classList.toggle("corrente", i === indice);
+  });
+  const percentuale = n > 1 ? (indice / (n - 1)) * 100 : 0;
+  $("binario-pieno").style.width = percentuale + "%";
+}
+
+function mostraDomanda() {
+  const d = CONFIG.domande[indice];
+  const totale = CONFIG.domande.length;
+  bloccato = false;
+
+  $("fermata-nome").textContent = d.fermata || "Fermata " + (indice + 1);
+  $("progresso-testo").textContent = "Domanda " + (indice + 1) + " di " + totale;
+  aggiornaLinea();
+
+  $("domanda-testo").textContent = d.testo;
+  impostaFoto($("domanda-foto"), d.foto);
+  $("commento").textContent = "";
+  $("btn-avanti").classList.remove("visibile");
+  $("btn-avanti").textContent = indice === totale - 1 ? "Vedi il risultato" : "Prossima fermata";
+
+  const box = $("risposte");
+  box.innerHTML = "";
+  d.risposte.forEach((testo, i) => {
+    const b = document.createElement("button");
+    b.className = "risposta";
+    b.style.animationDelay = (i * 70) + "ms";
+    b.type = "button";
+    b.textContent = testo;
+    b.addEventListener("click", () => scegli(i));
+    box.appendChild(b);
+  });
+}
+
+function scegli(i) {
+  if (bloccato) return;
+  bloccato = true;
+
+  const d = CONFIG.domande[indice];
+  const bottoni = $("risposte").querySelectorAll(".risposta");
+  const libera = d.giusta === null || d.giusta === undefined;
+  const corretta = libera || i === d.giusta;
+
+  bottoni.forEach((b, k) => {
+    b.disabled = true;
+    if (libera) {
+      b.classList.add(k === i ? "giusta" : "spenta");
+    } else if (k === d.giusta) {
+      b.classList.add("giusta");
+    } else if (k === i) {
+      b.classList.add("sbagliata");
+    } else {
+      b.classList.add("spenta");
+    }
+  });
+
+  if (corretta) { punti++; scoppio(bottoni[i]); }
+  $("commento").textContent = corretta ? d.ok : d.ko;
+  $("btn-avanti").classList.add("visibile");
+  $("btn-avanti").focus({ preventScroll: true });
+}
+
+const CHIAVE_SALVATAGGIO = "parigi-quiz-punti";
+
+function salvaPunti(n) {
+  try { localStorage.setItem(CHIAVE_SALVATAGGIO, String(n)); } catch (e) {}
+}
+
+function puntiValidi(v) {
+  if (v === null || v === "") return null;
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 0 && n <= CONFIG.domande.length ? n : null;
+}
+
+function leggiPuntiSalvati() {
+  try { return puntiValidi(localStorage.getItem(CHIAVE_SALVATAGGIO)); }
+  catch (e) { return null; }
+}
+
+
+function avanti() {
+  indice++;
+  if (indice < CONFIG.domande.length) mostraDomanda();
+  else { salvaPunti(punti); mostraFinale(); }
+}
+
+function mostraFinale(festeggia = true) {
+  const totale = CONFIG.domande.length;
+  const percentuale = Math.round((punti / totale) * 100);
+
+  const scaglioni = [...CONFIG.finali].sort((a, b) => b.da - a.da);
+  const f = scaglioni.find((s) => percentuale >= s.da) || scaglioni[scaglioni.length - 1];
+
+  $("punteggio").textContent = punti + "/" + totale;
+  $("finale-titolo").textContent = f.titolo;
+  $("finale-lettera").textContent = f.lettera;
+  $("b-da").textContent = CONFIG.biglietto.da;
+  $("b-a").textContent = CONFIG.biglietto.a;
+  $("b-pass").textContent = CONFIG.biglietto.passeggeri;
+  $("b-data").textContent = formattaDate();
+  $("busta-titolo").textContent = CONFIG.busta.titolo;
+  $("busta-testo").textContent = CONFIG.busta.testo;
+  $("btn-busta").textContent = CONFIG.busta.pulsante;
+  $("busta-stato").textContent = "";
+  $("b-nota").textContent = CONFIG.biglietto.nota;
+  $("finale-domanda").textContent = CONFIG.finale.domanda;
+  $("btn-rigioca").hidden = true;
+
+  mostra("finale");
+  if (festeggia) emoji();
+  aggiornaConto();
+}
+
+function rigioca() {
+  indice = 0;
+  punti = 0;
+  mostra("intro");
+}
+
+function riduciMovimento() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function scoppio(el) {
+  if (riduciMovimento()) return;
+  const r = el.getBoundingClientRect();
+  for (let n = 0; n < 8; n++) {
+    const c = document.createElement("span");
+    c.className = "mini-cuore";
+    c.textContent = "♥";
+    c.style.left = r.left + r.width * (.15 + Math.random() * .7) + "px";
+    c.style.top = r.top + r.height / 2 + "px";
+    c.style.setProperty("--dx", (Math.random() - .5) * 110 + "px");
+    c.style.setProperty("--dy", -(50 + Math.random() * 80) + "px");
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 1300);
+  }
+}
+
+function sfondo() {
+  if (riduciMovimento()) return;
+  setInterval(() => {
+    if (document.hidden) return;
+    const c = document.createElement("span");
+    c.className = "cuore-sfondo";
+    c.textContent = "♥";
+    c.style.left = Math.random() * 95 + "vw";
+    c.style.fontSize = .8 + Math.random() * .9 + "rem";
+    c.style.animationDuration = 10 + Math.random() * 6 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 17000);
+  }, 2600);
+}
+
+function emoji() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const set = ["♥", "💗", "💌", "✦"];
+  for (let n = 0; n < 18; n++) {
+    const c = document.createElement("span");
+    c.className = "cuore";
+    c.textContent = set[n % set.length];
+    c.style.left = Math.random() * 95 + "vw";
+    c.style.fontSize = 1 + Math.random() * 1.4 + "rem";
+    c.style.animationDuration = 3 + Math.random() * 3 + "s";
+    c.style.animationDelay = Math.random() * 1.2 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 8000);
+  }
+}
+
+const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+              "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+
+let oggi = null;
+let testoLettera = null;
+let daSchermata = "finale";
+let timerScrittura;
+
+async function oraServer() {
+  try {
+    const r = await fetch(location.href.split("#")[0], { method: "HEAD", cache: "no-store" });
+    const d = r.headers.get("Date");
+    if (d) return new Date(d);
+  } catch (e) { }
+  return new Date();
+}
+
+function dataParigi(d) {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
+}
+
+function giorniTra(daStr, aStr) {
+  const [y1, m1, d1] = daStr.split("-").map(Number);
+  const [y2, m2, d2] = aStr.split("-").map(Number);
+  return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86400000);
+}
+
+function formattaDate() {
+  const [, m1, g1] = CONFIG.viaggio.dal.split("-").map(Number);
+  const [, m2, g2] = CONFIG.viaggio.al.split("-").map(Number);
+  if (CONFIG.viaggio.dal === CONFIG.viaggio.al) return g1 + " " + MESI[m1 - 1];
+  if (m1 === m2) return g1 + "-" + g2 + " " + MESI[m1 - 1];
+  return g1 + " " + MESI[m1 - 1] + " - " + g2 + " " + MESI[m2 - 1];
+}
+
+function testoConto() {
+  if (!oggi) return "";
+  const alla = giorniTra(oggi, CONFIG.viaggio.dal);
+  if (alla > 1) return "Mancano " + alla + " giorni alla partenza";
+  if (alla === 1) return "Si parte domani";
+  if (alla === 0) return "Si parte oggi";
+  if (giorniTra(oggi, CONFIG.viaggio.al) >= 0) return "Siamo a Parigi";
+  return "Il primo viaggio è andato. Il prossimo?";
+}
+
+async function caricaLettera() {
+  try {
+    const r = await fetch("lettera.json", { cache: "no-store" });
+    if (!r.ok) return null;
+    const j = await r.json();
+    return typeof j.testo === "string" && j.testo.trim() ? j.testo : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+const tempo = oraServer().then((d) => { oggi = dataParigi(d); });
+
+caricaLettera().then((t) => {
+  $("btn-lettera-intro").textContent = CONFIG.busta.pulsanteIntro;
+  $("btn-lettera-intro").hidden = !t;
+});
+
+async function aggiornaConto() {
+  await tempo;
+  const conto = $("b-conto");
+  conto.textContent = testoConto();
+  conto.classList.remove("pop");
+  void conto.offsetWidth;
+  conto.classList.add("pop");
+}
+
+function scrivi(el, testo) {
+  clearTimeout(timerScrittura);
+  el.classList.remove("finito");
+  el.textContent = "";
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    el.textContent = testo;
+    el.classList.add("finito");
+    return;
+  }
+  let i = 0;
+  (function passo() {
+    el.textContent = testo.slice(0, ++i);
+    if (i < testo.length) timerScrittura = setTimeout(passo, 34);
+    else el.classList.add("finito");
+  })();
+}
+
+function apriLettera(da) {
+  daSchermata = da;
+  $("lettera-titolo").textContent = CONFIG.lettera.titolo;
+  mostra("lettera");
+  emoji();
+  scrivi($("lettera-testo"), testoLettera);
+}
+
+function saltaScrittura() {
+  if (!testoLettera) return;
+  clearTimeout(timerScrittura);
+  $("lettera-testo").textContent = testoLettera;
+  $("lettera-testo").classList.add("finito");
+}
+
+function distanzaKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
+  const h = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+function leggiPosizione() {
+  return new Promise((ok, ko) => {
+    if (!navigator.geolocation) { ko({ code: 2 }); return; }
+    navigator.geolocation.getCurrentPosition(ok, ko, {
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 0
+    });
+  });
+}
+
+let controllando = false;
+
+async function tentaApertura(da, stato) {
+  if (controllando) return;
+  controllando = true;
+  stato.textContent = "";
+  let aperta = false;
+  try {
+    const testo = await caricaLettera();
+    if (!testo) { stato.textContent = CONFIG.busta.chiusa; return; }
+
+    await tempo;
+    if (oggi !== CONFIG.viaggio.dal) {
+      stato.textContent = CONFIG.busta.data;
+      return;
+    }
+
+    stato.textContent = CONFIG.busta.controllo;
+    const pos = await leggiPosizione();
+    const c = pos.coords;
+    if (c.accuracy > 5000) { stato.textContent = CONFIG.busta.imprecisa; return; }
+    const l = CONFIG.viaggio.luogo;
+    if (distanzaKm(c.latitude, c.longitude, l.lat, l.lon) > l.raggioKm) {
+      stato.textContent = CONFIG.busta.chiusa;
+      return;
+    }
+
+    testoLettera = testo;
+    stato.textContent = "";
+    aperta = true;
+    apriLettera(da);
+  } catch (err) {
+    stato.textContent = err && err.code === 1 ? CONFIG.busta.negata : CONFIG.busta.nonTrovata;
+  } finally {
+    controllando = false;
+    if (!aperta && !riduciMovimento()) {
+      const b = $("busta-corpo");
+      b.classList.remove("rifiuta");
+      void b.offsetWidth;
+      b.classList.add("rifiuta");
+    }
+  }
+}
+
+$("btn-busta").addEventListener("click", () => tentaApertura("finale", $("busta-stato")));
+$("btn-lettera-intro").addEventListener("click", () => tentaApertura("intro", $("intro-stato")));
+$("btn-lettera-indietro").addEventListener("click", () => { clearTimeout(timerScrittura); mostra(daSchermata); });
+$("lettera-cartolina").addEventListener("click", saltaScrittura);
+
+$("btn-inizia").addEventListener("click", () => {
+  indice = 0;
+  punti = 0;
+  disegnaLinea();
+  mostra("quiz");
+  mostraDomanda();
+});
+$("btn-avanti").addEventListener("click", avanti);
+$("btn-rigioca").addEventListener("click", rigioca);
+
+inizializzaIntro();
+sfondo();
+
+// Per rifare il quiz (test): aggiungi ?reset alla fine del link.
+if (location.search.includes("reset")) {
+  try { localStorage.removeItem(CHIAVE_SALVATAGGIO); } catch (e) {}
+}
+// Priorità: punteggio fisso nel file, poi quello salvato nel browser, poi l'intro.
+const puntiIniziali = puntiValidi(CONFIG.finaleFisso) !== null
+  ? puntiValidi(CONFIG.finaleFisso)
+  : leggiPuntiSalvati();
+if (puntiIniziali !== null) {
+  punti = puntiIniziali;
+  mostraFinale(false);
+}
+</script>
+</body>
+</html>

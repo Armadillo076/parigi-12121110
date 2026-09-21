@@ -1,0 +1,58 @@
+# Pubblica il sito su GitHub Pages.
+# La lettera sta nel Secret "LETTERA" e viene aggiunta al sito (come lettera.json)
+# solo dal giorno di sblocco in poi. Prima di quel giorno non esiste da nessuna parte.
+name: Pubblica
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 5 * * *"     # ogni giorno alle 05:17 UTC (06:17 a Parigi in inverno)
+  workflow_dispatch:          # pulsante "Run workflow" per lanciarlo a mano
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepara il sito
+        env:
+          LETTERA: ${{ secrets.LETTERA }}
+          # Giorno da cui la lettera esiste sul sito (meglio il giorno PRIMA della partenza).
+          # Poi si apre solo se lei è a Parigi. Si può cambiare senza commit da
+          # Settings > Secrets and variables > Actions > Variables (nome: DATA_SBLOCCO)
+          DATA_SBLOCCO: ${{ vars.DATA_SBLOCCO || '2026-12-11' }}
+        shell: bash
+        run: |
+          mkdir _site
+          cp index.html _site/
+          if [ -d foto ]; then cp -r foto _site/; fi
+          OGGI=$(TZ=Europe/Paris date +%F)
+          if [ -n "$LETTERA" ] && [[ ! "$OGGI" < "$DATA_SBLOCCO" ]]; then
+            printf '%s' "$LETTERA" | jq -Rs '{testo: .}' > _site/lettera.json
+            echo "Lettera inclusa nel sito."
+          else
+            echo "Lettera non inclusa (ancora)."
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
