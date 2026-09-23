@@ -49,7 +49,7 @@
     padding: 1.5rem 1.25rem 2rem;
     display: flex;
     flex-Direction: column;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .schermata { display: none; }
@@ -307,6 +307,109 @@
   .biglietto b { font-weight: 700; font-size: 1.05rem; }
   .biglietto-nota { font-size: .95rem; line-height: 1.4; }
 
+  #mappa-sottotitolo { font-size: .98rem; opacity: .8; margin-bottom: 1.4rem; }
+
+  .btn-mappa-conto {
+    display: block;
+    font-size: .85rem;
+    opacity: .75;
+    margin-top: .3rem;
+  }
+
+  .mappa-lista { margin-bottom: .5rem; }
+  .mappa-tappa {
+    position: relative;
+    background: #fff;
+    border-radius: .35rem;
+    padding: 1.1rem 1.2rem;
+    margin: 0 .3rem 1.6rem;
+    box-shadow: 0 3px 10px rgba(20, 40, 74, .2);
+    border-top: 5px solid var(--smalto);
+    transform: rotate(-.9deg);
+  }
+  .mappa-tappa:nth-child(even) { transform: rotate(.9deg); }
+  .mappa-tappa::before,
+  .mappa-tappa::after {
+    content: "";
+    position: absolute;
+    top: -.55rem;
+    width: 1.6rem;
+    height: 1.1rem;
+    background: rgba(255, 205, 0, .55);
+    box-shadow: 0 1px 2px rgba(20, 40, 74, .2);
+  }
+  .mappa-tappa::before { left: .8rem; transform: rotate(-6deg); }
+  .mappa-tappa::after { right: .8rem; transform: rotate(5deg); }
+  .mappa-tappa-numero {
+    display: inline-grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-bottom: .5rem;
+    border-radius: 50%;
+    background: var(--linea);
+    color: var(--inchiostro);
+    font-family: var(--font-segnaletica);
+    font-weight: 800;
+    font-size: .95rem;
+  }
+  .mappa-tappa-luogo {
+    font-family: var(--font-segnaletica);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: .35rem;
+  }
+  .mappa-tappa-frase {
+    font-family: var(--font-mano);
+    font-weight: 500;
+    font-size: 1.35rem;
+    line-height: 1.3;
+    margin-bottom: 0;
+  }
+  .mappa-tappa.bloccata {
+    background: transparent;
+    border-top-color: var(--fuga);
+    border: 2px dashed var(--fuga);
+    border-top: 2px dashed var(--fuga);
+    box-shadow: none;
+  }
+  .mappa-tappa.bloccata::before,
+  .mappa-tappa.bloccata::after { display: none; }
+  .mappa-tappa.bloccata .mappa-tappa-numero { background: var(--fuga); color: #fff; }
+  .mappa-tappa.bloccata .mappa-tappa-luogo { color: var(--fuga); letter-spacing: .15em; }
+  .mappa-tappa-indizio {
+    display: inline-block;
+    margin-top: .6rem;
+    padding: .3rem .7rem;
+    border-radius: 99px;
+    background: var(--giusto-chiaro);
+    color: var(--giusto);
+    font-size: .9rem;
+    font-weight: 600;
+  }
+  .mappa-tappa-data {
+    font-size: .85rem;
+    opacity: .75;
+    margin-top: .15rem;
+  }
+
+  .chiave-input {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.1rem;
+    margin-bottom: .3rem;
+    border-radius: .5rem;
+    background: linear-gradient(#ffffff, #f0f4f5);
+    border: 1px solid #aeb9bf;
+    box-shadow: inset 0 -3px 0 #d3dbde, inset 0 2px 0 #fff;
+    font-size: 1.1rem;
+    font-family: var(--font-testo);
+    color: var(--inchiostro);
+    text-align: center;
+  }
+  .chiave-input:focus-visible { outline: 3px solid var(--smalto); outline-offset: 2px; }
+  .chiave-input.scuoti-input { animation: scuoti .45s ease-in-out; }
+
   .secondario {
     display: block;
     width: 100%;
@@ -341,7 +444,7 @@
     margin-bottom: .5rem;
   }
 
-  .busta { margin-bottom: 1.75rem; text-align: center; }
+  .busta { margin: 1.75rem 0; text-align: center; }
   .busta-corpo {
     position: relative;
     height: 7rem;
@@ -634,6 +737,11 @@
       <div class="biglietto-nota" id="b-nota"></div>
     </div>
 
+    <button class="secondario" id="btn-mappa">
+      🗺 La nostra mappa
+      <span class="btn-mappa-conto" id="btn-mappa-conto"></span>
+    </button>
+
     <div class="busta">
       <div class="busta-corpo" id="busta-corpo">
         <span class="scintilla" aria-hidden="true">✦</span>
@@ -652,6 +760,23 @@
     </div>
     <h2 class="targa media" id="finale-domanda"></h2>
     <button class="secondario" id="btn-rigioca">Rigioca</button>
+  </section>
+
+  <section id="mappa" class="schermata">
+    <div class="direzione"><span class="badge" aria-hidden="true">✦</span><span>La nostra mappa</span></div>
+    <h2 class="targa" id="mappa-titolo">La nostra mappa</h2>
+    <p id="mappa-sottotitolo">I luoghi della nostra storia, uno per volta. L'ultimo si scopre a Parigi.</p>
+    <div class="mappa-lista" id="mappa-lista"></div>
+    <button class="secondario" id="btn-mappa-indietro">Indietro</button>
+  </section>
+
+  <section id="chiave" class="schermata">
+    <h2 class="targa" id="chiave-titolo"></h2>
+    <p id="chiave-intro"></p>
+    <input type="text" id="chiave-input" class="chiave-input" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <p class="stato" id="chiave-stato" role="status"></p>
+    <button class="principale" id="btn-chiave-conferma"></button>
+    <button class="secondario" id="btn-chiave-indietro">Indietro</button>
   </section>
 
   <section id="lettera" class="schermata">
@@ -766,7 +891,7 @@ const CONFIG = {
   },
 
   biglietto: {
-    da: "Fiumicino",
+    da: "Bologna",
     a: "Parigi",
     passeggeri: "Ambra e Federico",
     nota: "Il nostro primo viaggio insieme."
@@ -789,6 +914,28 @@ const CONFIG = {
     titolo: "Benvenuta a Parigi"
   },
 
+  // Finché "parola" resta vuota, questo passaggio viene saltato e la lettera si apre subito.
+  // Quando decidi la parola chiave (ricostruita dagli indizi raccolti + l'ultimo pezzo dato a mano
+  // il 12 dicembre), scrivila qui tra virgolette e ripubblica.
+  chiave: {
+    titolo: "L'ultimo passo",
+    intro: "Hai raccolto tutti gli indizi lungo il percorso. Componili nell'ordine giusto per aprire la lettera.",
+    segnaposto: "La parola",
+    bottone: "Apri",
+    sbagliata: "Non è ancora questa.",
+    parola: ""
+  },
+
+  // Frammenti della mappa: si sbloccano in ordine, uno per volta, alla rispettiva data.
+  // "indizio" è il pezzo di parola chiave che lei raccoglie con quel frammento (l'ultimo pezzo
+  // glielo dai a mano il 12 dicembre, non sta qui). "foto" può restare vuota finché non hai le immagini.
+  frammenti: [
+    { data: "2026-10-05", luogo: "Il gruppo WhatsApp", frase: "", indizio: "", foto: "" },
+    { data: "2026-10-20", luogo: "La prima uscita", frase: "", indizio: "", foto: "" },
+    { data: "2026-11-05", luogo: "Matelica, lo scivolo", frase: "", indizio: "", foto: "" },
+    { data: "2026-11-20", luogo: "Fiastra", frase: "", indizio: "", foto: "" }
+  ],
+
   finale: {
     domanda: "Ci vediamo a Parigi?"
   },
@@ -800,7 +947,7 @@ const CONFIG = {
 };
 
 const $ = (id) => document.getElementById(id);
-const schermate = { intro: $("intro"), quiz: $("quiz"), finale: $("finale"), lettera: $("lettera") };
+const schermate = { intro: $("intro"), quiz: $("quiz"), finale: $("finale"), mappa: $("mappa"), chiave: $("chiave"), lettera: $("lettera") };
 
 let indice = 0;
 let punti = 0;
@@ -824,6 +971,13 @@ function inizializzaIntro() {
   $("intro-titolo").textContent = CONFIG.intro.titolo;
   $("intro-testo").textContent = CONFIG.intro.testo;
   impostaFoto($("intro-foto"), CONFIG.intro.foto);
+}
+
+function inizializzaChiave() {
+  $("chiave-titolo").textContent = CONFIG.chiave.titolo;
+  $("chiave-intro").textContent = CONFIG.chiave.intro;
+  $("chiave-input").placeholder = CONFIG.chiave.segnaposto;
+  $("btn-chiave-conferma").textContent = CONFIG.chiave.bottone;
 }
 
 function disegnaLinea() {
@@ -917,6 +1071,25 @@ function leggiPuntiSalvati() {
   catch (e) { return null; }
 }
 
+const CHIAVE_RISOLTA_SALVATAGGIO = "parigi-chiave-risolta";
+
+function normalizzaChiave(s) {
+  return s.normalize("NFD").replace(/[̀-ͯ]/g, "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function chiaveConfigurata() {
+  return normalizzaChiave(CONFIG.chiave.parola) !== "";
+}
+
+function chiaveGiaRisolta() {
+  try { return localStorage.getItem(CHIAVE_RISOLTA_SALVATAGGIO) === "1"; }
+  catch (e) { return false; }
+}
+
+function salvaChiaveRisolta() {
+  try { localStorage.setItem(CHIAVE_RISOLTA_SALVATAGGIO, "1"); } catch (e) {}
+}
+
 
 function avanti() {
   indice++;
@@ -949,6 +1122,8 @@ function mostraFinale(festeggia = true) {
   mostra("finale");
   if (festeggia) emoji();
   aggiornaConto();
+  aggiornaContoMappa();
+  tempo.then(aggiornaContoMappa);
 }
 
 function rigioca() {
@@ -1053,6 +1228,45 @@ function testoConto() {
   return "Il primo viaggio è andato. Il prossimo?";
 }
 
+function contaSbloccate() {
+  if (!oggi) return 0;
+  return CONFIG.frammenti.filter((t) => oggi >= t.data).length;
+}
+
+function aggiornaContoMappa() {
+  $("btn-mappa-conto").textContent = contaSbloccate() + "/" + CONFIG.frammenti.length + " tappe sbloccate";
+}
+
+function popolaMappa() {
+  const lista = $("mappa-lista");
+  lista.innerHTML = "";
+  const tappe = [...CONFIG.frammenti].sort((a, b) => a.data.localeCompare(b.data));
+  tappe.forEach((t, i) => {
+    const sbloccata = !!oggi && oggi >= t.data;
+    const card = document.createElement("div");
+    card.className = "mappa-tappa" + (sbloccata ? "" : " bloccata");
+    const numero = '<div class="mappa-tappa-numero">' + (i + 1) + '</div>';
+    if (sbloccata) {
+      card.innerHTML =
+        numero +
+        '<div class="mappa-tappa-luogo"></div>' +
+        (t.frase ? '<p class="mappa-tappa-frase"></p>' : "") +
+        (t.indizio ? '<div class="mappa-tappa-indizio">Indizio: <b></b></div>' : "");
+      card.querySelector(".mappa-tappa-luogo").textContent = t.luogo;
+      if (t.frase) card.querySelector(".mappa-tappa-frase").textContent = t.frase;
+      if (t.indizio) card.querySelector(".mappa-tappa-indizio b").textContent = t.indizio;
+    } else {
+      const [, m, g] = t.data.split("-").map(Number);
+      card.innerHTML =
+        numero +
+        '<div class="mappa-tappa-luogo">? ? ?</div>' +
+        '<div class="mappa-tappa-data"></div>';
+      card.querySelector(".mappa-tappa-data").textContent = "Si sblocca il " + g + " " + MESI[m - 1];
+    }
+    lista.appendChild(card);
+  });
+}
+
 async function caricaLettera() {
   try {
     const r = await fetch("lettera.json", { cache: "no-store" });
@@ -1103,6 +1317,28 @@ function apriLettera(da) {
   mostra("lettera");
   emoji();
   scrivi($("lettera-testo"), testoLettera);
+}
+
+function apriChiaveOLettera(da) {
+  if (!chiaveConfigurata() || chiaveGiaRisolta()) { apriLettera(da); return; }
+  daSchermata = da;
+  $("chiave-input").value = "";
+  $("chiave-stato").textContent = "";
+  mostra("chiave");
+  $("chiave-input").focus();
+}
+
+function tentaChiave() {
+  if (normalizzaChiave($("chiave-input").value) === normalizzaChiave(CONFIG.chiave.parola)) {
+    salvaChiaveRisolta();
+    apriLettera(daSchermata);
+    return;
+  }
+  $("chiave-stato").textContent = CONFIG.chiave.sbagliata;
+  const inp = $("chiave-input");
+  inp.classList.remove("scuoti-input");
+  void inp.offsetWidth;
+  inp.classList.add("scuoti-input");
 }
 
 function saltaScrittura() {
@@ -1161,7 +1397,7 @@ async function tentaApertura(da, stato) {
     testoLettera = testo;
     stato.textContent = "";
     aperta = true;
-    apriLettera(da);
+    apriChiaveOLettera(da);
   } catch (err) {
     stato.textContent = err && err.code === 1 ? CONFIG.busta.negata : CONFIG.busta.nonTrovata;
   } finally {
@@ -1178,6 +1414,11 @@ async function tentaApertura(da, stato) {
 $("btn-busta").addEventListener("click", () => tentaApertura("finale", $("busta-stato")));
 $("btn-lettera-intro").addEventListener("click", () => tentaApertura("intro", $("intro-stato")));
 $("btn-lettera-indietro").addEventListener("click", () => { clearTimeout(timerScrittura); mostra(daSchermata); });
+$("btn-mappa").addEventListener("click", async () => { await tempo; popolaMappa(); mostra("mappa"); });
+$("btn-mappa-indietro").addEventListener("click", () => mostra("finale"));
+$("btn-chiave-conferma").addEventListener("click", tentaChiave);
+$("btn-chiave-indietro").addEventListener("click", () => mostra(daSchermata));
+$("chiave-input").addEventListener("keydown", (e) => { if (e.key === "Enter") tentaChiave(); });
 $("lettera-cartolina").addEventListener("click", saltaScrittura);
 
 $("btn-inizia").addEventListener("click", () => {
@@ -1191,6 +1432,7 @@ $("btn-avanti").addEventListener("click", avanti);
 $("btn-rigioca").addEventListener("click", rigioca);
 
 inizializzaIntro();
+inizializzaChiave();
 sfondo();
 
 // Per rifare il quiz (test): aggiungi ?reset alla fine del link.
