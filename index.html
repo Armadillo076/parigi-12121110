@@ -444,6 +444,26 @@
     100% { opacity: 0; transform: translateY(-112vh) translateX(-16px) rotate(-6deg); }
   }
 
+  /* Coordinate di Parigi che compaiono a caso, si sollevano appena e svaniscono */
+  .coordinata {
+    position: fixed;
+    font-family: var(--font-mano);
+    font-style: italic;
+    letter-spacing: .03em;
+    white-space: nowrap;
+    color: #e8607a;
+    text-shadow: 0 0 8px rgba(232, 96, 122, .45);
+    pointer-events: none;
+    z-index: 2;
+    animation: appare-coordinata ease-in-out forwards;
+  }
+  @keyframes appare-coordinata {
+    0% { opacity: 0; transform: translateY(8px) rotate(var(--inclina, 0deg)) scale(.94); }
+    20% { opacity: .5; }
+    70% { opacity: .38; }
+    100% { opacity: 0; transform: translateY(-22px) rotate(var(--inclina, 0deg)) scale(1); }
+  }
+
   /* Sfondo che si scurisce piano piano verso la "notte parigina" man mano che si avvicina il viaggio */
   :root { --notte: 0; }
 
@@ -694,7 +714,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
-    .cuore, .cuore-sfondo, .mini-cuore, .busta-cuore, .lucciola { display: none; }
+    .cuore, .cuore-sfondo, .mini-cuore, .busta-cuore, .lucciola, .coordinata { display: none; }
   }
 
   /* Il testo della busta resta leggibile: si schiarisce man mano che lo sfondo si scurisce */
@@ -789,7 +809,6 @@
         <span class="busta-cuore" aria-hidden="true">♥</span>
       </div>
       <h3 id="busta-titolo"></h3>
-      <p id="busta-testo"></p>
       <button class="secondario" id="btn-busta"></button>
       <p class="stato" id="busta-stato" role="status"></p>
     </div>
@@ -895,7 +914,8 @@ const CONFIG = {
   viaggio: {
     dal: "2026-12-11",
     al: "2026-12-14",
-    luogo: { lat: 48.8566, lon: 2.3522, raggioKm: 15 }
+    // La lettera si apre da questo giorno e da quest'ora (ora di Parigi) in poi.
+    apertura: { data: "2026-12-12", ora: 16 }
   },
 
   biglietto: {
@@ -907,15 +927,10 @@ const CONFIG = {
 
   busta: {
     titolo: "Una lettera per Parigi",
-    testo: "Si apre solo quando sei davvero a Parigi.",
     pulsante: "Prova ad aprirla",
     pulsanteIntro: "C'è una lettera per te",
     chiusa: "Non ancora. Si apre a Parigi.",
-    data: "La lettera si apre solo il giorno della partenza, a Parigi.",
-    controllo: "Controllo dove sei...",
-    negata: "Per aprirla devo sapere se sei a Parigi. Consenti la posizione per questo sito e riprova.",
-    nonTrovata: "Non riesco a capire dove sei. Attiva la posizione (meglio con il GPS) e riprova.",
-    imprecisa: "La posizione non è abbastanza precisa. Riprova all'aperto o con il GPS attivo."
+    data: "La lettera si apre il 12 dicembre, dalle 16:00."
   },
 
   lettera: {
@@ -1107,7 +1122,6 @@ function mostraFinale(festeggia = true) {
   $("b-pass").textContent = CONFIG.biglietto.passeggeri;
   $("b-data").textContent = formattaDate();
   $("busta-titolo").textContent = CONFIG.busta.titolo;
-  $("busta-testo").textContent = CONFIG.busta.testo;
   $("btn-busta").textContent = CONFIG.busta.pulsante;
   $("busta-stato").textContent = "";
   $("b-nota").textContent = CONFIG.biglietto.nota;
@@ -1157,6 +1171,36 @@ function sfondo() {
     document.body.appendChild(c);
     setTimeout(() => c.remove(), 17000);
   }, 2600);
+}
+
+function coordinate() {
+  if (riduciMovimento()) return;
+  // Solo un frammento, mai la coordinata intera: una sola cifra decimale in meno, un cuoricino
+  // o una stellina accanto. Come un pensiero a metà.
+  const pezzi = [
+    () => "48.85° N",
+    () => "2.35° E",
+    () => "48.8566…",
+    () => "…2.3522",
+    () => "48.8° N ♥",
+    () => "✦ 2.3° E",
+    () => "48°51′ N",
+    () => "2°21′ E"
+  ];
+  setInterval(() => {
+    if (document.hidden || Math.random() > .75) return;
+    const c = document.createElement("span");
+    c.className = "coordinata";
+    c.textContent = pezzi[Math.floor(Math.random() * pezzi.length)]();
+    c.style.left = 4 + Math.random() * 60 + "vw";
+    c.style.top = 8 + Math.random() * 80 + "vh";
+    c.style.fontSize = (.8 + Math.random() * .3).toFixed(2) + "rem";
+    c.style.setProperty("--inclina", (Math.random() * 10 - 5).toFixed(1) + "deg");
+    const durata = 5 + Math.random() * 3;
+    c.style.animationDuration = durata + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), durata * 1000 + 200);
+  }, 2200);
 }
 
 function lucciole() {
@@ -1209,6 +1253,7 @@ const MESI = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
               "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
 
 let oggi = null;
+let oraOggi = null;
 let testoLettera = null;
 let daSchermata = "finale";
 let timerScrittura;
@@ -1224,6 +1269,11 @@ async function oraServer() {
 
 function dataParigi(d) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(d);
+}
+
+function oraParigi(d) {
+  const h = new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Paris", hour: "2-digit", hour12: false }).format(d);
+  return Number(h) % 24;
 }
 
 function giorniTra(daStr, aStr) {
@@ -1274,7 +1324,7 @@ async function caricaLettera() {
   }
 }
 
-const tempo = oraServer().then((d) => { oggi = dataParigi(d); aggiornaNotte(); });
+const tempo = oraServer().then((d) => { oggi = dataParigi(d); oraOggi = oraParigi(d); aggiornaNotte(); });
 
 caricaLettera().then((t) => {
   $("btn-lettera-intro").textContent = CONFIG.busta.pulsanteIntro;
@@ -1344,23 +1394,9 @@ function saltaScrittura() {
   $("lettera-testo").classList.add("finito");
 }
 
-function distanzaKm(lat1, lon1, lat2, lon2) {
-  const R = 6371, rad = Math.PI / 180;
-  const dLat = (lat2 - lat1) * rad, dLon = (lon2 - lon1) * rad;
-  const h = Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1 * rad) * Math.cos(lat2 * rad) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
-function leggiPosizione() {
-  return new Promise((ok, ko) => {
-    if (!navigator.geolocation) { ko({ code: 2 }); return; }
-    navigator.geolocation.getCurrentPosition(ok, ko, {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    });
-  });
+function letteraAperta() {
+  const a = CONFIG.viaggio.apertura;
+  return oggi > a.data || (oggi === a.data && oraOggi >= a.ora);
 }
 
 let controllando = false;
@@ -1375,18 +1411,8 @@ async function tentaApertura(da, stato) {
     if (!testo) { stato.textContent = CONFIG.busta.chiusa; return; }
 
     await tempo;
-    if (oggi !== CONFIG.viaggio.dal) {
+    if (!letteraAperta()) {
       stato.textContent = CONFIG.busta.data;
-      return;
-    }
-
-    stato.textContent = CONFIG.busta.controllo;
-    const pos = await leggiPosizione();
-    const c = pos.coords;
-    if (c.accuracy > 5000) { stato.textContent = CONFIG.busta.imprecisa; return; }
-    const l = CONFIG.viaggio.luogo;
-    if (distanzaKm(c.latitude, c.longitude, l.lat, l.lon) > l.raggioKm) {
-      stato.textContent = CONFIG.busta.chiusa;
       return;
     }
 
@@ -1394,8 +1420,6 @@ async function tentaApertura(da, stato) {
     stato.textContent = "";
     aperta = true;
     apriChiaveOLettera(da);
-  } catch (err) {
-    stato.textContent = err && err.code === 1 ? CONFIG.busta.negata : CONFIG.busta.nonTrovata;
   } finally {
     controllando = false;
     if (!aperta && !riduciMovimento()) {
@@ -1428,6 +1452,7 @@ $("btn-rigioca").addEventListener("click", rigioca);
 inizializzaIntro();
 inizializzaChiave();
 sfondo();
+coordinate();
 lucciole();
 
 // Per rifare il quiz (test): aggiungi ?reset alla fine del link.
