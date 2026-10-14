@@ -491,7 +491,7 @@
   /* La finestra dell'hotel: man mano che si avvicina il viaggio le tende si aprono e, dietro il vetro,
      spunta la Torre Eiffel di notte. --p (0 → 1) segue il buio progressivo di --notte. */
   #finestra {
-    --p: clamp(0, calc((var(--notte, 0) - .06) / .64), 1);
+    --p: clamp(0, calc((var(--notte, 0) - .06) / .79), 1);
     position: fixed;
     bottom: 0;
     left: 50%;
@@ -775,7 +775,7 @@
   }
 
   /* Il testo della busta resta leggibile: si schiarisce man mano che lo sfondo si scurisce */
-  #busta-titolo, #busta-testo {
+  #busta-testo {
     color: color-mix(in srgb, var(--inchiostro) calc((1 - var(--notte, 0)) * 100%), #fff calc(var(--notte, 0) * 100%));
     transition: color 2.5s ease;
   }
@@ -903,7 +903,6 @@
         <span class="busta-cuore" aria-hidden="true">♥</span>
         <span class="busta-cuore" aria-hidden="true">♥</span>
       </div>
-      <h3 id="busta-titolo"></h3>
       <button class="secondario" id="btn-busta"></button>
       <p class="stato" id="busta-stato" role="status"></p>
     </div>
@@ -1021,10 +1020,9 @@ const CONFIG = {
   },
 
   busta: {
-    titolo: "Una lettera per Parigi",
     pulsante: "Prova ad aprirla",
     pulsanteIntro: "C'è una lettera per te",
-    chiusa: "Non ancora. Si apre a Parigi.",
+    chiusa: "Non ancora. Si apre nella notte tra l'11 e il 12 dicembre.",
     data: "La lettera si apre nella notte tra l'11 e il 12 dicembre."
   },
 
@@ -1216,7 +1214,6 @@ function mostraFinale(festeggia = true) {
   $("b-a").textContent = CONFIG.biglietto.a;
   $("b-pass").textContent = CONFIG.biglietto.passeggeri;
   $("b-data").textContent = formattaDate();
-  $("busta-titolo").textContent = CONFIG.busta.titolo;
   $("btn-busta").textContent = CONFIG.busta.pulsante;
   $("busta-stato").textContent = "";
   $("b-nota").textContent = CONFIG.biglietto.nota;
