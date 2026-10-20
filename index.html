@@ -866,6 +866,92 @@
     animation: battito 1.8s ease-in-out infinite;
   }
 
+  /* Il cuore sul muro: in fondo alla pagina, nel margine a sinistra (fuori dalla finestra al centro e dal contenuto).
+     Sembra un cuoricino decorativo; al tocco fa uscire dal muro una piccola nota accanto a sé. */
+  .segreto { position: relative; margin-top: auto; padding-top: 1rem; }
+  .segreto-posto { position: relative; width: 2.75rem; height: 2.75rem; margin-left: -.825rem; }
+  .segreto-cuore {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: none;
+    color: #e0506e;
+    font-size: 1.5rem;
+    line-height: 1;
+    touch-action: manipulation;
+    transition: transform .25s ease;
+  }
+  .segreto-cuore > span {
+    text-shadow: 0 1px 3px rgba(150, 30, 60, .35);
+    animation: battito 1.8s ease-in-out infinite;
+  }
+  /* Un'ondina sottile che parte con il primo battito e si perde nel muro */
+  .segreto-cuore::before {
+    content: "";
+    position: absolute;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    border: 1.5px solid #e0506e;
+    opacity: 0;
+    pointer-events: none;
+    animation: segreto-onda 1.8s ease-out infinite;
+  }
+  @keyframes segreto-onda {
+    0%, 10% { opacity: 0; transform: scale(.7); }
+    12% { opacity: .5; transform: scale(.8); }
+    48%, 100% { opacity: 0; transform: scale(1.9); }
+  }
+  .segreto-cuore:hover { transform: scale(1.12); }
+  .segreto-cuore:active { transform: scale(.92); }
+  .segreto-cuore:focus-visible { outline: 2px solid #e23a52; outline-offset: -3px; }
+  .segreto-nota {
+    position: absolute;
+    left: calc(100% - .2rem);
+    top: 50%;
+    z-index: 3;
+    width: max-content;
+    max-width: min(17rem, calc(100vw - 4rem));
+    padding: .65rem 1rem .7rem;
+    border-radius: 1.1rem;
+    background: #fff;
+    border: 1.5px solid rgba(200, 16, 46, .28);
+    box-shadow: 0 6px 18px rgba(20, 40, 74, .22);
+    color: var(--inchiostro);
+    font-family: var(--font-mano);
+    font-weight: 500;
+    font-size: 1.4rem;
+    line-height: 1.2;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-.6rem, -50%) scale(.94);
+    transform-origin: 0 50%;
+    transition: opacity .3s ease, transform .35s cubic-bezier(.2, .8, .2, 1), visibility 0s .35s;
+  }
+  .segreto-nota.aperta {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%) scale(1);
+    transition: opacity .3s ease, transform .35s cubic-bezier(.2, .8, .2, 1), visibility 0s;
+  }
+  .segreto-nota::before {
+    content: "";
+    position: absolute;
+    left: -.4rem;
+    top: 50%;
+    width: .8rem;
+    height: .8rem;
+    margin-top: -.4rem;
+    background: #fff;
+    border-left: 1.5px solid rgba(200, 16, 46, .28);
+    border-bottom: 1.5px solid rgba(200, 16, 46, .28);
+    transform: rotate(45deg);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .cuore, .cuore-sfondo, .mini-cuore, .busta-cuore, .lucciola, .coordinata, .avviso-stella, .avviso::after { display: none; }
@@ -1021,6 +1107,13 @@
     <button class="secondario" id="btn-lettera-indietro">Indietro</button>
   </section>
 
+  <div class="segreto" id="segreto">
+    <div class="segreto-posto">
+      <button type="button" class="segreto-cuore" id="segreto-cuore" aria-label="Un cuore sul muro" aria-expanded="false" aria-controls="segreto-nota"><span aria-hidden="true">♥</span></button>
+      <div class="segreto-nota" id="segreto-nota" role="note">Le cose più belle non si rivelano tutte insieme.</div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -1120,7 +1213,7 @@ const CONFIG = {
     pulsante: "Prova ad aprirla",
     pulsanteIntro: "C'è una lettera per te",
     chiusa: "Non ancora. Si apre nella notte tra l'11 e il 12 dicembre.",
-    data: "La lettera si apre nella notte tra l'11 e il 12 dicembre."
+    data: "Non tutte le sorprese appartengono al giorno."
   },
 
   lettera: {
@@ -1667,6 +1760,29 @@ $("btn-inizia").addEventListener("click", () => {
 });
 $("btn-avanti").addEventListener("click", avanti);
 $("btn-rigioca").addEventListener("click", rigioca);
+
+// Il cuore sul muro: la nota si apre al tocco e si chiude ritoccando il cuore o la nota, toccando altrove o con Esc.
+// Subito dopo l'apertura i tocchi non la chiudono, così un doppio tocco involontario non la fa sparire.
+let segretoAperto = false;
+let segretoApertoAlle = 0;
+
+function impostaSegreto(aperto) {
+  if (!aperto && Date.now() - segretoApertoAlle < 600) return;
+  segretoAperto = aperto;
+  if (aperto) segretoApertoAlle = Date.now();
+  if (aperto) scoppio($("segreto-cuore"));
+  $("segreto-nota").classList.toggle("aperta", aperto);
+  $("segreto-cuore").setAttribute("aria-expanded", String(aperto));
+}
+
+$("segreto-cuore").addEventListener("click", () => impostaSegreto(!segretoAperto));
+$("segreto-nota").addEventListener("click", () => impostaSegreto(false));
+document.addEventListener("click", (e) => {
+  if (segretoAperto && !e.target.closest("#segreto")) impostaSegreto(false);
+});
+document.addEventListener("keydown", (e) => {
+  if (segretoAperto && e.key === "Escape") impostaSegreto(false);
+});
 
 inizializzaIntro();
 inizializzaChiave();
