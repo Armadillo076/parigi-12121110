@@ -952,6 +952,114 @@
     transform: rotate(45deg);
   }
 
+  /* La chiave sta accanto alla busta, ancorata al suo contenitore: segue la larghezza reale della busta
+     (--kx = metà busta + un respiro) e l'altezza fissa di 7rem, quindi non dipende da coordinate della pagina. */
+  .busta { position: relative; --d: 2.75rem; --kx: calc(min(8.5rem, 50%) + 1.1rem); }
+  .busta-chiave {
+    position: absolute;
+    left: calc(50% + var(--kx));
+    top: 5.5rem;
+    z-index: 3;
+    width: var(--d);
+    height: var(--d);
+    margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  }
+  .segreto-chiave-btn {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: none;
+    color: #d4a93e;
+    touch-action: manipulation;
+    transition: transform .25s ease;
+  }
+  .segreto-chiave-btn svg {
+    position: relative;
+    width: 1.75rem;
+    height: auto;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    rotate: -38deg;
+    transform-origin: 25% 50%;
+    filter: drop-shadow(0 1px 1.5px rgba(90, 60, 0, .3));
+    animation: chiave-su-giu 3.6s ease-in-out infinite, chiave-oscilla 4.8s ease-in-out infinite;
+  }
+  /* Un alone dorato molto tenue che respira insieme al movimento */
+  .segreto-chiave-btn::before {
+    content: "";
+    position: absolute;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 205, 0, .34), rgba(255, 170, 120, .12) 48%, transparent 70%);
+    opacity: .4;
+    pointer-events: none;
+    animation: chiave-bagliore 3.6s ease-in-out infinite;
+  }
+  @keyframes chiave-su-giu {
+    0%, 100% { translate: 0 1px; }
+    50% { translate: 0 -4px; }
+  }
+  @keyframes chiave-oscilla {
+    0%, 100% { rotate: -41deg; }
+    50% { rotate: -35deg; }
+  }
+  @keyframes chiave-bagliore {
+    0%, 100% { opacity: .3; transform: scale(.9); }
+    50% { opacity: .85; transform: scale(1.08); }
+  }
+  /* Al tocco la chiave gira un attimo, come in una serratura, e l'alone si accende */
+  .segreto-chiave-btn.tocco svg { animation: chiave-su-giu 3.6s ease-in-out infinite, chiave-oscilla 4.8s ease-in-out infinite, chiave-tocco .6s ease-out; }
+  .segreto-chiave-btn.tocco::before { animation: chiave-lampo .6s ease-out; }
+  @keyframes chiave-tocco {
+    0% { transform: scale(1) rotate(0); }
+    30% { transform: scale(1.25) rotate(-16deg); }
+    60% { transform: scale(1.08) rotate(9deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  @keyframes chiave-lampo {
+    0% { opacity: .4; transform: scale(.9); }
+    35% { opacity: 1; transform: scale(1.35); }
+    100% { opacity: .4; transform: scale(1); }
+  }
+  /* Col mouse la chiave si fa appena più presente */
+  .segreto-chiave-btn:hover { transform: scale(1.1); }
+  .segreto-chiave-btn:hover::before { animation-duration: 1.8s; }
+  .segreto-chiave-btn:active { transform: scale(.94); }
+  .segreto-chiave-btn:focus-visible { outline: 2px solid #c9a03a; outline-offset: -3px; }
+  /* La nota si apre sotto la busta, sul muro libero, con la codina verso la chiave */
+  .busta-chiave-nota {
+    left: auto;
+    right: calc(50% - var(--kx) - .9rem);
+    top: calc(7rem + .9rem);
+    max-width: min(16rem, calc(100vw - 2.5rem));
+    text-align: left;
+    transform: translateY(-.5rem) scale(.94);
+    transform-origin: 90% 0;
+  }
+  .busta-chiave-nota.aperta { transform: none; }
+  .busta-chiave-nota::before {
+    left: auto;
+    right: .5rem;
+    top: -.4rem;
+    margin-top: 0;
+    border-bottom: 0;
+    border-left: 1.5px solid rgba(200, 16, 46, .28);
+    border-top: 1.5px solid rgba(200, 16, 46, .28);
+  }
+  /* Sugli schermi più stretti il margine a lato della busta è minimo: la chiave si accosta di più, un po' più piccola */
+  @media (max-width: 22rem) {
+    .busta { --d: 2.5rem; --kx: calc(min(8.5rem, 50%) + .2rem); }
+    .segreto-chiave-btn svg { width: 1.5rem; }
+    .busta-chiave-nota { font-size: 1.2rem; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
     .cuore, .cuore-sfondo, .mini-cuore, .busta-cuore, .lucciola, .coordinata, .avviso-stella, .avviso::after { display: none; }
@@ -1087,6 +1195,12 @@
         <span class="busta-cuore" aria-hidden="true">♥</span>
         <span class="lucchetto" aria-hidden="true">🔒<span class="lucchetto-stella">✦</span><span class="lucchetto-stella">✦</span><span class="lucchetto-stella">✦</span><span class="lucchetto-stella">✦</span></span>
       </div>
+      <div class="busta-chiave" id="segreto-chiave">
+        <button type="button" class="segreto-chiave-btn" id="segreto-chiave-btn" aria-label="Una chiave accanto alla busta" aria-expanded="false" aria-controls="segreto-chiave-nota">
+          <svg viewBox="0 0 32 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5"/><circle cx="8" cy="8" r="1.7"/><path d="M13 8H29M24.5 8v4M28.5 8v3"/></svg>
+        </button>
+      </div>
+      <div class="segreto-nota busta-chiave-nota" id="segreto-chiave-nota" role="note">C'è qualcosa che potrai leggere soltanto quando avrai ciò che serve per aprirlo.</div>
       <p class="stato" id="busta-stato" role="status"></p>
     </div>
     <button class="secondario" id="btn-rigioca">Rigioca</button>
@@ -1761,27 +1875,46 @@ $("btn-inizia").addEventListener("click", () => {
 $("btn-avanti").addEventListener("click", avanti);
 $("btn-rigioca").addEventListener("click", rigioca);
 
-// Il cuore sul muro: la nota si apre al tocco e si chiude ritoccando il cuore o la nota, toccando altrove o con Esc.
+// Gli indizi sul muro (il cuore a sinistra, la chiave a destra): ognuno ha la sua nota, che si apre al tocco
+// e si chiude ritoccando il simbolo o la nota, toccando altrove o con Esc. Ne resta aperta una sola alla volta.
 // Subito dopo l'apertura i tocchi non la chiudono, così un doppio tocco involontario non la fa sparire.
-let segretoAperto = false;
-let segretoApertoAlle = 0;
+const segreti = [];
 
-function impostaSegreto(aperto) {
-  if (!aperto && Date.now() - segretoApertoAlle < 600) return;
-  segretoAperto = aperto;
-  if (aperto) segretoApertoAlle = Date.now();
-  if (aperto) scoppio($("segreto-cuore"));
-  $("segreto-nota").classList.toggle("aperta", aperto);
-  $("segreto-cuore").setAttribute("aria-expanded", String(aperto));
+function creaSegreto(idRadice, idBottone, idNota, conScoppio) {
+  const s = { aperto: false, apertoAlle: 0 };
+  s.imposta = (aperto, forza) => {
+    if (!aperto && !forza && Date.now() - s.apertoAlle < 600) return;
+    if (aperto) {
+      segreti.forEach((altro) => { if (altro !== s) altro.imposta(false, true); });
+      s.apertoAlle = Date.now();
+      if (conScoppio) scoppio($(idBottone));
+    }
+    s.aperto = aperto;
+    $(idNota).classList.toggle("aperta", aperto);
+    $(idBottone).setAttribute("aria-expanded", String(aperto));
+  };
+  $(idBottone).addEventListener("click", () => s.imposta(!s.aperto));
+  $(idNota).addEventListener("click", () => s.imposta(false));
+  document.addEventListener("click", (e) => {
+    if (s.aperto && !e.target.closest("#" + idRadice)) s.imposta(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (s.aperto && e.key === "Escape") s.imposta(false);
+  });
+  segreti.push(s);
 }
 
-$("segreto-cuore").addEventListener("click", () => impostaSegreto(!segretoAperto));
-$("segreto-nota").addEventListener("click", () => impostaSegreto(false));
-document.addEventListener("click", (e) => {
-  if (segretoAperto && !e.target.closest("#segreto")) impostaSegreto(false);
-});
-document.addEventListener("keydown", (e) => {
-  if (segretoAperto && e.key === "Escape") impostaSegreto(false);
+creaSegreto("segreto", "segreto-cuore", "segreto-nota", true);
+creaSegreto("segreto-chiave", "segreto-chiave-btn", "segreto-chiave-nota", false);
+
+let timerTocco = null;
+$("segreto-chiave-btn").addEventListener("click", () => {
+  const b = $("segreto-chiave-btn");
+  b.classList.remove("tocco");
+  void b.offsetWidth;
+  b.classList.add("tocco");
+  clearTimeout(timerTocco);
+  timerTocco = setTimeout(() => b.classList.remove("tocco"), 700);
 });
 
 inizializzaIntro();
